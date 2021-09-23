@@ -1,7 +1,7 @@
 server {
 	# Ports to listen on
-	listen 443 ssl http2;
-	listen [::]:443 ssl http2;
+	listen 80;
+	listen [::]:80;
 
 	# Server name to listen for
 	server_name multisite-subdomain.com *.multisite-subdomain.com;
@@ -9,22 +9,25 @@ server {
 	# Path to document root
 	root /sites/multisite-subdomain.com/public;
 
-	# Paths to certificate files.
-	ssl_certificate /etc/letsencrypt/live/multisite-subdomain.com/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/multisite-subdomain.com/privkey.pem;
-
 	# File to be used as index
 	index index.php;
 
-	# Overrides logs defined in nginx.conf, allows per site logs.
+	#send logs to global aggregate logs
+	error_log /var/log/nginx/error.log warn;
+	access_log /var/log/nginx/access.log;
+
+	# Site specific logs.
 	access_log /sites/multisite-subdomain.com/logs/access.log;
 	error_log /sites/multisite-subdomain.com/logs/error.log;
 
 	# Default server block rules
 	include global/server/defaults.conf;
 
-	# SSL rules
-	include global/server/ssl.conf;
+	# LetsEncrypt acme-challenge
+	location ^~ /.well-known/acme-challenge {
+        root /sites/letsencrypt/public;
+        try_files $uri $uri/ =404;
+    }
 
 	location / {
 		try_files $uri $uri/ /index.php?$args;
@@ -35,18 +38,12 @@ server {
 		include global/fastcgi-params.conf;
 
 		# Use the php pool defined in the upstream variable.
-		# See global/php-pool.conf for definition.
-		fastcgi_pass   $upstream;
+        # See global/php-pool.conf for definition.
+        fastcgi_pass   $upstream;
 	}
-}
 
-# Redirect http to https
-server {
-	listen 80;
-	listen [::]:80;
-	server_name multisite-subdomain.com *.multisite-subdomain.com;
-
-	return 301 https://$host$request_uri;
+    # Rewrite robots.txt
+    rewrite ^/robots.txt$ /index.php last;
 }
 
 # Redirect www to non-www

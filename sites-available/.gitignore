@@ -4,8 +4,11 @@
 # Except
 !.gitignore
 !default
+!fastcgi-cache.com
 !multisite-subdirectory.com
 !multisite-subdomain.com
-!single-site-no-ssl.com
-!single-site.com
-!single-site-with-caching.com
+!singlesite.com
+!ssl.com
+!ssl-fastcgi-cache.com
+!ssl-multisite-subdirectory.com
+!ssl-multisite-subdomain.com
