@@ -18,8 +18,13 @@ services:
       - "traefik.http.services.teste.loadbalancer.server.port=80"
     networks:
       - "webproxy"
-
+    environment:
+      WORDPRESS_DB_HOST: dbhost:25060
+      WORDPRESS_DB_USER: dbuser
+      WORDPRESS_DB_PASSWORD: dbpass
+      WORDPRESS_DB_NAME: dbname
 networks:
   webproxy:
     external:
       name: webproxy
+
