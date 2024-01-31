@@ -11,6 +11,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./public/:/var/www/html
+      - ./apache/:/etc/apache2/sites-enabled
     labels:
       - "traefik.http.routers.teste.rule=Host(`teste.intest.com.br`)"
       - "traefik.http.routers.teste.tls=true"
