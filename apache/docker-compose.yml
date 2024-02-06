@@ -1,0 +1,31 @@
+version: "2"
+
+services:
+  web:
+    container_name: teste
+    image: wordpress:latest
+    ports:
+      - "80"
+    mem_limit: 1024m
+    mem_reservation: 128M
+    restart: unless-stopped
+    volumes:
+      - ./public/:/var/www/html
+      - ./apache/000-default.conf:/etc/apache2/sites-available/000-default.conf:ro
+      - ./apache/.htpasswd:/etc/apache2/.htpasswd
+    labels:
+      - "traefik.http.routers.teste.rule=Host(`teste.intest.com.br`)"
+      - "traefik.http.routers.teste.tls=true"
+      - "traefik.http.routers.teste.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.teste.loadbalancer.server.port=80"
+    networks:
+      - "webproxy"
+    environment:
+      WORDPRESS_DB_HOST: dbhost:25060
+      WORDPRESS_DB_USER: dbuser
+      WORDPRESS_DB_PASSWORD: dbpass
+      WORDPRESS_DB_NAME: dbname
+networks:
+  webproxy:
+    external:
+      name: webproxy
