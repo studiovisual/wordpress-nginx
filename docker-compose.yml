@@ -6,8 +6,11 @@ services:
     image: wordpress:latest
     ports:
       - "80"
-    mem_limit: 1024m
-    mem_reservation: 128M
+    deploy:
+      resources:
+        limits:
+          cpus: '2'  
+          memory: 1024M  
     restart: unless-stopped
     volumes:
       - ./public/:/var/www/html
